@@ -2,11 +2,12 @@ import PropTypes from 'prop-types';
 import { Button, Item, List } from './ContactList.styled';
 import { useDispatch, useSelector } from 'react-redux';
 import { deleteContact } from 'store/contactsSlice';
+import { setStateFilter, setStatecontacts } from 'store/selector';
 
 export const ContactList = () => {
     const dispatch = useDispatch();
-    const contacts = useSelector(state => state.contacts.contacts);
-    const filter = useSelector(state => state.filter);
+    const contacts = useSelector(setStatecontacts);
+    const filter = useSelector(setStateFilter);
 
     const delContact = id => dispatch(deleteContact(id));
 

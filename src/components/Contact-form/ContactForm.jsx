@@ -4,10 +4,11 @@ import { validationSchema } from 'services/validate-schema';
 import { useDispatch, useSelector } from 'react-redux';
 import { addContact } from 'store/contactsSlice';
 import { toast } from 'react-toastify';
+import { setStatecontacts } from 'store/selector';
 
 export const ContactForm = () => {
     const dispatch = useDispatch();
-    const contacts = useSelector(state => state.contacts.contacts);
+    const contacts = useSelector(setStatecontacts);
 
     return (
         <Formik
