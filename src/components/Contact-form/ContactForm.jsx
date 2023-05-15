@@ -1,53 +1,73 @@
-import { Component } from 'react';
 import { FormikForm, Label, Input, SubmitButton } from './ContactForm.styled';
 import { Formik, ErrorMessage } from 'formik';
 import { validationSchema } from 'services/validate-schema';
+import { useDispatch, useSelector } from 'react-redux';
+import { addContact } from 'store/contactsSlice';
+import { toast } from 'react-toastify';
 
-const initialState = {
-    name: '',
-    number: '',
+export const ContactForm = () => {
+    const dispatch = useDispatch();
+    const contacts = useSelector(state => state.contacts.contacts);
+
+    return (
+        <Formik
+            validationSchema={validationSchema}
+            initialValues={{
+                name: '',
+                number: '',
+            }}
+            onSubmit={(values, { resetForm }) => {
+                const isNameExist = contacts.find(
+                    val => val.name.toLowerCase() === values.name.toLowerCase()
+                );
+                const isNumberExist = contacts.find(
+                    val => val.number === values.number
+                );
+                if (isNameExist) {
+                    toast(`${values.name} is already in contacts.`);
+                    return;
+                }
+                if (isNumberExist) {
+                    toast(
+                        `${values.number} is already in contacts as ${isNumberExist.name}.`
+                    );
+                    return;
+                }
+                dispatch(addContact(values));
+                resetForm();
+            }}
+        >
+            {({ handleSubmit, handleChange }) => {
+                return (
+                    <FormikForm onSubmit={handleSubmit}>
+                        <Label>
+                            Name
+                            <Input
+                                type="text"
+                                name="name"
+                                placeholder="Enter contact name"
+                                onChange={val => {
+                                    handleChange(val);
+                                }}
+                            />
+                            <ErrorMessage name="name" />
+                        </Label>
+                        <Label>
+                            Number
+                            <Input
+                                type="tel"
+                                name="number"
+                                placeholder="Enter contact number"
+                                onChange={val => {
+                                    handleChange(val);
+                                }}
+                            />
+                            <ErrorMessage name="number" />
+                        </Label>
+                        <SubmitButton type="submit">Add contact</SubmitButton>
+                    </FormikForm>
+                );
+            }}
+        </Formik>
+    );
 };
-
-export class ContactForm extends Component {
-    onFormSubmit = (values, { resetForm }) => {
-        this.props.onSubmit(values);
-        resetForm();
-    };
-
-    onleInputChange = e => {
-        const { name, value } = e.currentTarget;
-        this.setState({ [name]: value });
-    };
-
-    render() {
-        return (
-            <Formik
-                validationSchema={validationSchema}
-                initialValues={initialState}
-                onSubmit={this.onFormSubmit}
-            >
-                <FormikForm>
-                    <Label>
-                        Name
-                        <Input
-                            type="text"
-                            name="name"
-                            placeholder="Enter contact name"
-                        />
-                        <ErrorMessage name="name" />
-                    </Label>
-                    <Label>
-                        Number
-                        <Input
-                            type="tel"
-                            name="number"
-                            placeholder="Enter contact number"
-                        />
-                        <ErrorMessage name="number" />
-                    </Label>
-                    <SubmitButton type="submit">Add contact</SubmitButton>
-                </FormikForm>
-            </Formik>
-        );
-    }
-}
